@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sessionizing", "Sessionizing\Sessionizing.csproj", "{185C027A-ACF5-499D-8612-AF4A5D5053BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{185C027A-ACF5-499D-8612-AF4A5D5053BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{185C027A-ACF5-499D-8612-AF4A5D5053BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{185C027A-ACF5-499D-8612-AF4A5D5053BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{185C027A-ACF5-499D-8612-AF4A5D5053BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
