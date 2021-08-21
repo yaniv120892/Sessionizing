@@ -1,5 +1,6 @@
 ﻿using System;
 using Sessionizing.Abstractions;
+using Sessionizing.Exceptions;
 
 namespace Sessionizing.Menus.MenuHandlers
 {
@@ -16,8 +17,15 @@ namespace Sessionizing.Menus.MenuHandlers
         {
             Console.WriteLine("Enter site url");
             string siteUrl = Console.ReadLine();
-            int numOfSessions = m_sessionCounter.Count(siteUrl);
-            Console.WriteLine($"Num of sessions for {siteUrl} is {numOfSessions}");
+            try
+            {
+                int numOfSessions = m_sessionCounter.Count(siteUrl);
+                Console.WriteLine($"Num of sessions for {siteUrl} is {numOfSessions}");
+            }
+            catch (UnknownSiteUrlException e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

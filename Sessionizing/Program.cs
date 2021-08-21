@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using NLog;
 using Sessionizing.Menus;
 using Unity;
 
@@ -8,6 +9,8 @@ namespace Sessionizing
 {
     class Program
     {
+        private static readonly Logger s_logger = LogManager.GetCurrentClassLogger();
+        
         static void Main(string[] args)
         {
             if (!TryGetFilesToRead(args, out IReadOnlyList<string> filesToRead))
@@ -20,8 +23,16 @@ namespace Sessionizing
             var initializer = new Initializer(unityContainer);
             initializer.Initialize(filesToRead);
             var menuGenerator = new MenuGenerator(unityContainer);
-            Menu menu = menuGenerator.Generate();
-            menu.Run();
+            try
+            {
+                Menu menu = menuGenerator.Generate();
+                menu.Run();
+            }
+            catch (Exception e)
+            {
+                s_logger.Error(e, "Got an error");
+                Console.WriteLine($"Got an error {e.Message}, existing...");
+            }
         }
 
         private static bool TryGetFilesToRead(string[] args, out IReadOnlyList<string> filesToRead)

@@ -6,66 +6,41 @@ namespace Sessionizing.Providers
 {
     internal class SessionsProvider : ISessionCounter, ISessionMedianLengthCalculator
     {
-        private readonly IPageViewsRepository m_pageViewsRepository;
+        private readonly ISessionsForSiteUrlController m_sessionsForSiteUrlController;
+        private readonly Dictionary<string, int> m_cacheSessionCount;
+        private readonly Dictionary<string, double> m_cacheSessionMedianLength;
 
-        public SessionsProvider(IPageViewsRepository pageViewsRepository)
+        public SessionsProvider(ISessionsForSiteUrlController sessionsForSiteUrlController)
         {
-            m_pageViewsRepository = pageViewsRepository;
+            m_cacheSessionCount = new Dictionary<string, int>();
+            m_cacheSessionMedianLength = new Dictionary<string, double>();
+            m_sessionsForSiteUrlController = sessionsForSiteUrlController;
         }
         
         public int Count(string siteUrl)
         {
-            return GetSiteSessions(siteUrl).Count();
+            if (!m_cacheSessionCount.ContainsKey(siteUrl))
+            {
+                m_cacheSessionCount[siteUrl] = m_sessionsForSiteUrlController.GetSessions(siteUrl).Count();
+            }
+
+            return m_cacheSessionCount[siteUrl];
         }
+            
 
         public double Calculate(string siteUrl)
         {
-            List<long> sessionsLength = GetSiteSessions(siteUrl).Select(m=> m.SessionLength).ToList();
-            sessionsLength.Sort();
-            return sessionsLength[sessionsLength.Count / 2];
-        }
-        
-        private IEnumerable<Session> GetSiteSessions(string siteUrl)
-        {
-            var pageViewsForSite = m_pageViewsRepository.GetPageViewForSite(siteUrl);
-            return GetSessions(pageViewsForSite);
-        }
-
-        private static IEnumerable<Session> GetSessions(List<PageView> pageViewsForSite)
-        {
-            pageViewsForSite.Sort(CompareByTimestamp);
-            var sessions = new List<Session>();
-            var inProgressSessions = new Dictionary<string, Session>();
-            
-            foreach (PageView pageView in pageViewsForSite)
+            if (!m_cacheSessionMedianLength.ContainsKey(siteUrl))
             {
-                string dictionaryKey = GetDictionaryKey(pageView);
-                if (inProgressSessions.TryGetValue(dictionaryKey, out Session session))
-                {
-                    if (session.IsBelongToSession(pageView))
-                    {
-                        session.AddPageView(pageView);
-                        continue;
-                    }
-
-                    sessions.Add(session);
-                }
-
-                inProgressSessions[dictionaryKey] = new Session(pageView);
+                List<long> sessionsLength = m_sessionsForSiteUrlController
+                    .GetSessions(siteUrl)
+                    .Select(m=> m.SessionLength)
+                    .ToList();
+                sessionsLength.Sort();
+                m_cacheSessionMedianLength[siteUrl] = sessionsLength[sessionsLength.Count / 2];
             }
-
-            sessions.AddRange(inProgressSessions.Values);
-            return sessions;
-        }
-
-        private static string GetDictionaryKey(PageView pageView)
-        {
-            return $"{pageView.VisitorId}_{pageView.SiteUrl}";
-        }
-
-        private static int CompareByTimestamp(PageView x1, PageView y1)
-        {
-            return (int) (x1.TimeStamp - y1.TimeStamp);
+            
+            return m_cacheSessionMedianLength[siteUrl];
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Sessionizing.Abstractions;
+using Sessionizing.Exceptions;
 
 namespace Sessionizing.Menus.MenuHandlers
 {
@@ -16,8 +17,15 @@ namespace Sessionizing.Menus.MenuHandlers
         {
             Console.WriteLine("Enter visitor id");
             string visitorId = Console.ReadLine();
-            int numOfUniqueVisitedSites = m_uniqueVisitedSitesProvider.Get(visitorId);
-            Console.WriteLine($"Num of unique visited sites for {visitorId} is {numOfUniqueVisitedSites}");
+            try
+            {
+                int numOfUniqueVisitedSites = m_uniqueVisitedSitesProvider.Get(visitorId);
+                Console.WriteLine($"Num of unique visited sites for {visitorId} is {numOfUniqueVisitedSites}");
+            }
+            catch (UnknownVisitorIdException e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

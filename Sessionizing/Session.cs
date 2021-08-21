@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 
 namespace Sessionizing
 {
-    internal class Session
+    public class Session
     {
         private const int c_maxPeriodBetweenPageViewsInSeconds = 1800;
         
